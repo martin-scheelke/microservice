@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-client
+  labels:
+    app: time-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-client
+  template:
+    metadata:
+      labels:
+        app: time-client
+    spec:
+      containers:
+        - name: time-client
+          image: time-client:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: TIME_CLIENT_BASE_URL
+              value: http://microservice:8080
+          readinessProbe:
+            httpGet:
+              path: /client/time
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-client
+spec:
+  selector:
+    app: time-client
+  ports:
+    - port: 8081
+      targetPort: 8081
+      nodePort: 30081
+  type: NodePort

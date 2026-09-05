@@ -1,0 +1,7 @@
+target/
+client/
+k8s/
+pacts/
+.git/
+.idea/
+*.md

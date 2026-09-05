@@ -1,0 +1,126 @@
+stages:
+  - build
+  - test
+  - contract
+  - package
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B -ntp"
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  TESTCONTAINERS_HOST_OVERRIDE: docker
+
+.maven_cache: &maven_cache
+  cache:
+    key: maven-repo
+    paths:
+      - .m2/repository
+
+.dind: &dind
+  image: maven:3.9-eclipse-temurin-24
+  services:
+    - docker:24-dind
+
+build-microservice:
+  stage: build
+  image: maven:3.9-eclipse-temurin-24
+  <<: *maven_cache
+  script:
+    - mvn $MAVEN_CLI_OPTS -DskipTests package
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+
+build-client:
+  stage: build
+  image: maven:3.9-eclipse-temurin-24
+  <<: *maven_cache
+  script:
+    - mvn $MAVEN_CLI_OPTS -f client/pom.xml -DskipTests package
+  artifacts:
+    paths:
+      - client/target/*.jar
+    expire_in: 1 hour
+
+unit-test-microservice:
+  stage: test
+  image: maven:3.9-eclipse-temurin-24
+  <<: *maven_cache
+  needs: ["build-microservice"]
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dtest=DefaultTimeServiceTest,TimeControllerTest
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+
+unit-test-client:
+  stage: test
+  image: maven:3.9-eclipse-temurin-24
+  <<: *maven_cache
+  needs: ["build-client"]
+  script:
+    - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=ClientControllerTest
+  artifacts:
+    when: always
+    reports:
+      junit: client/target/surefire-reports/TEST-*.xml
+
+integration-test-microservice:
+  stage: test
+  <<: *dind
+  <<: *maven_cache
+  needs: ["build-microservice"]
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dtest='*IntegrationTest,*RestAssuredTest,*DumpTest'
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+
+pact-consumer:
+  stage: contract
+  image: maven:3.9-eclipse-temurin-24
+  <<: *maven_cache
+  needs: ["build-client"]
+  script:
+    - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=TimeClientPactTest
+  artifacts:
+    when: always
+    paths:
+      - pacts/*.json
+    reports:
+      junit: client/target/surefire-reports/TEST-*.xml
+    expire_in: 1 week
+
+pact-provider-verify:
+  stage: contract
+  <<: *dind
+  <<: *maven_cache
+  needs: ["build-microservice", "pact-consumer"]
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dtest=TimeApiPactVerificationTest
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+
+docker-build-microservice:
+  stage: package
+  image: docker:24
+  services:
+    - docker:24-dind
+  needs: ["unit-test-microservice", "integration-test-microservice", "pact-provider-verify"]
+  script:
+    - docker build -t microservice:$CI_COMMIT_SHORT_SHA .
+
+docker-build-client:
+  stage: package
+  image: docker:24
+  services:
+    - docker:24-dind
+  needs: ["unit-test-client", "pact-consumer"]
+  script:
+    - docker build -t time-client:$CI_COMMIT_SHORT_SHA ./client

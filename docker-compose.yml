@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: timedb
+      POSTGRES_USER: timedb
+      POSTGRES_PASSWORD: timedb
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U timedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/timedb
+      SPRING_DATASOURCE_USERNAME: timedb
+      SPRING_DATASOURCE_PASSWORD: timedb
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    environment:
+      TIME_CLIENT_BASE_URL: http://microservice:8080
+    ports:
+      - "8081:8081"
+    depends_on:
+      - microservice
