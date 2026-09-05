@@ -22,6 +22,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <openapi-generator.version>7.25.0</openapi-generator.version>
     <rest-assured.version>6.0.1</rest-assured.version>
+    <pact.version>4.6.17</pact.version>
+    <testcontainers.version>1.21.2</testcontainers.version>
   </properties>
 
   <dependencies>
@@ -46,16 +48,21 @@
       <artifactId>spring-boot-starter-jooq</artifactId>
     </dependency>
 
-    <!-- In-memory database -->
+    <!-- PostgreSQL database -->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- Serves the H2 web console at /h2-console (Spring Boot 4 split this out of core autoconfigure) -->
+
+    <!-- Flyway schema migrations -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-h2console</artifactId>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
 
@@ -76,6 +83,31 @@
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>${rest-assured.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testcontainers: real PostgreSQL for integration tests -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Pact V4: provider-side contract verification against the consumer's pact file -->
+    <dependency>
+      <groupId>au.com.dius.pact.provider</groupId>
+      <artifactId>junit5spring</artifactId>
+      <version>${pact.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
