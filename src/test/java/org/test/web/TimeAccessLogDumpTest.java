@@ -16,13 +16,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.test.data.TimeRepository;
+import org.test.support.PostgresTestcontainersConfig;
 
 /**
  * Calls the time endpoint several times, then dumps the whole
  * {@code time_access_log} table so the accumulated audit rows can be inspected.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(PostgresTestcontainersConfig.class)
 class TimeAccessLogDumpTest {
 
     private static final Logger log = LoggerFactory.getLogger(TimeAccessLogDumpTest.class);

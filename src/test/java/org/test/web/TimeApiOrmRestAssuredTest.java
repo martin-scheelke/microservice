@@ -14,8 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.test.data.TimeRepository;
 import org.test.data.orm.OrmTimeRepository;
+import org.test.support.PostgresTestcontainersConfig;
 
 /**
  * Full-stack REST Assured test with the app switched to the JPA/ORM
@@ -24,6 +26,7 @@ import org.test.data.orm.OrmTimeRepository;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "app.db.access-mode=orm")
+@Import(PostgresTestcontainersConfig.class)
 class TimeApiOrmRestAssuredTest {
 
     @LocalServerPort

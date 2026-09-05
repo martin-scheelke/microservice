@@ -13,8 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.test.data.TimeRepository;
 import org.test.data.jooq.JooqTimeRepository;
+import org.test.support.PostgresTestcontainersConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.assertj.core.api.Assertions;
@@ -24,6 +26,7 @@ import org.assertj.core.api.Assertions;
  * (jOOQ) data-access layer.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(PostgresTestcontainersConfig.class)
 class TimeApiJooqRestAssuredTest {
 
     @LocalServerPort
