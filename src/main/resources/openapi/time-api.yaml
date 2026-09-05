@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: Time Microservice API
+  description: Returns the current time. Data access is served either by jOOQ or by JPA/ORM,
+    selected at runtime via the `app.db.access-mode` configuration property.
+  version: 1.0.0
+servers:
+  - url: /
+tags:
+  - name: time
+    description: Current time operations
+paths:
+  /api/v1/time:
+    get:
+      tags:
+        - time
+      summary: Get the current time
+      operationId: getCurrentTime
+      responses:
+        '200':
+          description: The current time as reported through the active data-access layer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeResponse'
+components:
+  schemas:
+    TimeResponse:
+      type: object
+      required:
+        - currentTime
+        - accessMode
+      properties:
+        currentTime:
+          type: string
+          format: date-time
+          description: Current time obtained from the in-memory database.
+          example: '2026-09-02T10:15:30Z'
+        accessMode:
+          type: string
+          description: Which data-access layer produced the value.
+          enum:
+            - jooq
+            - orm
+          example: jooq
+        accessLogId:
+          type: integer
+          format: int64
+          description: Identifier of the audit row written for this request.
+          example: 42

@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: microservice
+
+  datasource:
+    url: jdbc:h2:mem:timedb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate.format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Application configuration.
+# access-mode selects the DB-access layer at startup: jooq (default) or orm.
+# It also drives the @ConditionalOnProperty switch on the two TimeRepository beans.
+app:
+  db:
+    access-mode: jooq
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.jooq.Constants: warn
