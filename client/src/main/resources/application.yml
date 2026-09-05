@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: time-client
+
+time-client:
+  base-url: http://localhost:8080
+
+server:
+  port: 8081
