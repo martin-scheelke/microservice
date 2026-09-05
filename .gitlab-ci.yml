@@ -11,21 +11,25 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   TESTCONTAINERS_HOST_OVERRIDE: docker
 
-.maven_cache: &maven_cache
+.maven_cache:
   cache:
     key: maven-repo
     paths:
       - .m2/repository
 
-.dind: &dind
+.maven_job:
+  extends: .maven_cache
+  image: maven:3.9-eclipse-temurin-24
+
+.dind_job:
+  extends: .maven_cache
   image: maven:3.9-eclipse-temurin-24
   services:
     - docker:24-dind
 
 build-microservice:
+  extends: .maven_job
   stage: build
-  image: maven:3.9-eclipse-temurin-24
-  <<: *maven_cache
   script:
     - mvn $MAVEN_CLI_OPTS -DskipTests package
   artifacts:
@@ -34,9 +38,8 @@ build-microservice:
     expire_in: 1 hour
 
 build-client:
+  extends: .maven_job
   stage: build
-  image: maven:3.9-eclipse-temurin-24
-  <<: *maven_cache
   script:
     - mvn $MAVEN_CLI_OPTS -f client/pom.xml -DskipTests package
   artifacts:
@@ -45,9 +48,8 @@ build-client:
     expire_in: 1 hour
 
 unit-test-microservice:
+  extends: .maven_job
   stage: test
-  image: maven:3.9-eclipse-temurin-24
-  <<: *maven_cache
   needs: ["build-microservice"]
   script:
     - mvn $MAVEN_CLI_OPTS test -Dtest=DefaultTimeServiceTest,TimeControllerTest
@@ -57,9 +59,8 @@ unit-test-microservice:
       junit: target/surefire-reports/TEST-*.xml
 
 unit-test-client:
+  extends: .maven_job
   stage: test
-  image: maven:3.9-eclipse-temurin-24
-  <<: *maven_cache
   needs: ["build-client"]
   script:
     - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=ClientControllerTest
@@ -69,9 +70,8 @@ unit-test-client:
       junit: client/target/surefire-reports/TEST-*.xml
 
 integration-test-microservice:
+  extends: .dind_job
   stage: test
-  <<: *dind
-  <<: *maven_cache
   needs: ["build-microservice"]
   script:
     - mvn $MAVEN_CLI_OPTS test -Dtest='*IntegrationTest,*RestAssuredTest,*DumpTest'
@@ -81,9 +81,8 @@ integration-test-microservice:
       junit: target/surefire-reports/TEST-*.xml
 
 pact-consumer:
+  extends: .maven_job
   stage: contract
-  image: maven:3.9-eclipse-temurin-24
-  <<: *maven_cache
   needs: ["build-client"]
   script:
     - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=TimeClientPactTest
@@ -96,9 +95,8 @@ pact-consumer:
     expire_in: 1 week
 
 pact-provider-verify:
+  extends: .dind_job
   stage: contract
-  <<: *dind
-  <<: *maven_cache
   needs: ["build-microservice", "pact-consumer"]
   script:
     - mvn $MAVEN_CLI_OPTS test -Dtest=TimeApiPactVerificationTest
