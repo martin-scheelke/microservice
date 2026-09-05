@@ -15,7 +15,11 @@ docker build -t time-client:local -f "$repoRoot/client/Dockerfile" $repoRoot
 if ($LASTEXITCODE -ne 0) { throw "docker build (time-client) failed" }
 
 $clusterName = "time-microservice"
-$existing = kind get clusters 2>$null
+try {
+    $existing = kind get clusters 2>$null
+} catch {
+    $existing = @()
+}
 if ($existing -contains $clusterName) {
     Write-Host "kind cluster '$clusterName' already exists, reusing it."
 } else {

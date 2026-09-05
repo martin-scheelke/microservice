@@ -20,6 +20,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
+    <!-- Spring Boot 4 modularised RestClient autoconfiguration into its own module -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-restclient</artifactId>
+    </dependency>
 
     <!-- Tests -->
     <dependency>

@@ -5,7 +5,7 @@
   "interactions": [
     {
       "comments": {
-        "testname": "org.test.client.pact.TimeClientPactTest.clientParsesCurrentTimeFromProvider(MockServer)",
+        "testname": "org.microservice.client.pact.TimeClientPactTest.clientParsesCurrentTimeFromProvider(MockServer)",
         "text": [
 
         ]

@@ -44,10 +44,12 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Flyway schema migrations -->
+    <!-- Flyway schema migrations. Spring Boot 4 moved FlywayAutoConfiguration out of
+         spring-boot-autoconfigure into this dedicated starter; flyway-core alone no
+         longer gets migrations run automatically. -->
     <dependency>
-      <groupId>org.flywaydb</groupId>
-      <artifactId>flyway-core</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -123,8 +125,8 @@
               <inputSpec>${project.basedir}/src/main/resources/openapi/time-api.yaml</inputSpec>
               <generatorName>spring</generatorName>
               <output>${project.build.directory}/generated-sources/openapi</output>
-              <apiPackage>org.test.api</apiPackage>
-              <modelPackage>org.test.model</modelPackage>
+              <apiPackage>org.microservice.api</apiPackage>
+              <modelPackage>org.microservice.model</modelPackage>
               <generateApiTests>false</generateApiTests>
               <generateApiDocumentation>false</generateApiDocumentation>
               <generateModelTests>false</generateModelTests>

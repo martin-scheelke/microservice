@@ -9,7 +9,7 @@
     <relativePath/>
   </parent>
 
-  <groupId>org.test</groupId>
+  <groupId>org.microservice</groupId>
   <artifactId>time-microservice-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
