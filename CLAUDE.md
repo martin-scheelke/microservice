@@ -25,7 +25,7 @@ Before modifying existing code, inspect the relevant implementation, tests, conf
 
 The project uses:
 
-Java 21
+Java 24
 Spring Boot 4.x
 Spring Framework 7.x
 Maven
@@ -75,9 +75,9 @@ When uncertain about a Spring Boot API, inspect the project’s dependencies or 
 
 
 
-4. Java 21
+4. Java 24
 
-Use Java 21.
+Use Java 24.
 
 Modern Java features are encouraged where they improve readability.
 
