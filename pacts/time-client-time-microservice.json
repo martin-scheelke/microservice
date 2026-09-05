@@ -1,0 +1,87 @@
+{
+  "consumer": {
+    "name": "time-client"
+  },
+  "interactions": [
+    {
+      "comments": {
+        "testname": "org.test.client.pact.TimeClientPactTest.clientParsesCurrentTimeFromProvider(MockServer)",
+        "text": [
+
+        ]
+      },
+      "description": "a request for the current time",
+      "key": "c5fb22bc",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "the time service is available"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/time"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "accessLogId": 42,
+            "accessMode": "jooq",
+            "currentTime": "2026-09-02T10:15:30Z"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.accessLogId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$.accessMode": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "jooq|orm"
+                }
+              ]
+            },
+            "$.currentTime": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "\\d{4}-\\d{2}-\\d{2}T.*"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "transport": "http",
+      "type": "Synchronous/HTTP"
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.17"
+    },
+    "pactSpecification": {
+      "version": "4.0"
+    }
+  },
+  "provider": {
+    "name": "time-microservice"
+  }
+}
