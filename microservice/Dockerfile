@@ -6,16 +6,16 @@ WORKDIR /build
 COPY pom.xml .
 COPY microservice/pom.xml microservice/pom.xml
 COPY client/pom.xml client/pom.xml
-RUN mvn -B -q -pl client -am dependency:go-offline || true
+RUN mvn -B -q -pl microservice -am dependency:go-offline || true
 
-COPY client/src client/src
-RUN mvn -B -q -pl client -am package -DskipTests
+COPY microservice/src microservice/src
+RUN mvn -B -q -pl microservice -am package -DskipTests
 
 FROM eclipse-temurin:24-jre-alpine
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
-COPY --from=build /build/client/target/time-client-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /build/microservice/target/microservice-1.0-SNAPSHOT.jar app.jar
 USER app
 
-EXPOSE 8081
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

@@ -31,17 +31,17 @@ build-microservice:
   extends: .maven_job
   stage: build
   script:
-    - mvn $MAVEN_CLI_OPTS -DskipTests package
+    - mvn $MAVEN_CLI_OPTS -pl microservice -am -DskipTests package
   artifacts:
     paths:
-      - target/*.jar
+      - microservice/target/*.jar
     expire_in: 1 hour
 
 build-client:
   extends: .maven_job
   stage: build
   script:
-    - mvn $MAVEN_CLI_OPTS -f client/pom.xml -DskipTests package
+    - mvn $MAVEN_CLI_OPTS -pl client -am -DskipTests package
   artifacts:
     paths:
       - client/target/*.jar
@@ -52,18 +52,18 @@ unit-test-microservice:
   stage: test
   needs: ["build-microservice"]
   script:
-    - mvn $MAVEN_CLI_OPTS test -Dtest=DefaultTimeServiceTest,TimeControllerTest
+    - mvn $MAVEN_CLI_OPTS -pl microservice -am test -Dtest=DefaultTimeServiceTest,TimeControllerTest
   artifacts:
     when: always
     reports:
-      junit: target/surefire-reports/TEST-*.xml
+      junit: microservice/target/surefire-reports/TEST-*.xml
 
 unit-test-client:
   extends: .maven_job
   stage: test
   needs: ["build-client"]
   script:
-    - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=ClientControllerTest
+    - mvn $MAVEN_CLI_OPTS -pl client -am test -Dtest=ClientControllerTest
   artifacts:
     when: always
     reports:
@@ -74,22 +74,22 @@ integration-test-microservice:
   stage: test
   needs: ["build-microservice"]
   script:
-    - mvn $MAVEN_CLI_OPTS test -Dtest='*IntegrationTest,*RestAssuredTest,*DumpTest'
+    - mvn $MAVEN_CLI_OPTS -pl microservice -am test -Dtest='*IntegrationTest,*RestAssuredTest,*DumpTest'
   artifacts:
     when: always
     reports:
-      junit: target/surefire-reports/TEST-*.xml
+      junit: microservice/target/surefire-reports/TEST-*.xml
 
 pact-consumer:
   extends: .maven_job
   stage: contract
   needs: ["build-client"]
   script:
-    - mvn $MAVEN_CLI_OPTS -f client/pom.xml test -Dtest=TimeClientPactTest
+    - mvn $MAVEN_CLI_OPTS -pl client -am test -Dtest=TimeClientPactTest
   artifacts:
     when: always
     paths:
-      - pacts/*.json
+      - microservice/pacts/*.json
     reports:
       junit: client/target/surefire-reports/TEST-*.xml
     expire_in: 1 week
@@ -99,11 +99,11 @@ pact-provider-verify:
   stage: contract
   needs: ["build-microservice", "pact-consumer"]
   script:
-    - mvn $MAVEN_CLI_OPTS test -Dtest=TimeApiPactVerificationTest
+    - mvn $MAVEN_CLI_OPTS -pl microservice -am test -Dtest=TimeApiPactVerificationTest
   artifacts:
     when: always
     reports:
-      junit: target/surefire-reports/TEST-*.xml
+      junit: microservice/target/surefire-reports/TEST-*.xml
 
 docker-build-microservice:
   stage: package
@@ -112,7 +112,7 @@ docker-build-microservice:
     - docker:24-dind
   needs: ["unit-test-microservice", "integration-test-microservice", "pact-provider-verify"]
   script:
-    - docker build -t microservice:$CI_COMMIT_SHORT_SHA .
+    - docker build -t microservice:$CI_COMMIT_SHORT_SHA -f microservice/Dockerfile .
 
 docker-build-client:
   stage: package
@@ -121,4 +121,4 @@ docker-build-client:
     - docker:24-dind
   needs: ["unit-test-client", "pact-consumer"]
   script:
-    - docker build -t time-client:$CI_COMMIT_SHORT_SHA ./client
+    - docker build -t time-client:$CI_COMMIT_SHORT_SHA -f client/Dockerfile .

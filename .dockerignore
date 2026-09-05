@@ -1,7 +1,6 @@
 target/
-client/
 k8s/
-pacts/
+scripts/
 .git/
 .idea/
 *.md

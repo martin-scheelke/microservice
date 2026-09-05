@@ -3,25 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.8</version>
-    <relativePath/>
+    <groupId>org.test</groupId>
+    <artifactId>time-microservice-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>
   </parent>
 
-  <groupId>org.test</groupId>
   <artifactId>time-client</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>time-client</name>
   <description>Consumer client for the Time microservice, used to demonstrate consumer-driven Pact contracts</description>
-
-  <properties>
-    <java.version>24</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <pact.version>4.6.17</pact.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -63,7 +55,7 @@
         <configuration>
           <systemPropertyVariables>
             <!-- Shared with the microservice's provider verification test via @PactFolder("pacts") -->
-            <pact.rootDir>${project.basedir}/../pacts</pact.rootDir>
+            <pact.rootDir>${project.basedir}/../microservice/pacts</pact.rootDir>
           </systemPropertyVariables>
         </configuration>
       </plugin>

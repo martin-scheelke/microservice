@@ -16,7 +16,7 @@ services:
   microservice:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: microservice/Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/timedb
       SPRING_DATASOURCE_USERNAME: timedb
@@ -29,8 +29,8 @@ services:
 
   client:
     build:
-      context: ./client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: client/Dockerfile
     environment:
       TIME_CLIENT_BASE_URL: http://microservice:8080
     ports:

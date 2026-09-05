@@ -7,11 +7,11 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
 Write-Host "Building microservice:local image..."
-docker build -t microservice:local $repoRoot
+docker build -t microservice:local -f "$repoRoot/microservice/Dockerfile" $repoRoot
 if ($LASTEXITCODE -ne 0) { throw "docker build (microservice) failed" }
 
 Write-Host "Building time-client:local image..."
-docker build -t time-client:local "$repoRoot/client"
+docker build -t time-client:local -f "$repoRoot/client/Dockerfile" $repoRoot
 if ($LASTEXITCODE -ne 0) { throw "docker build (time-client) failed" }
 
 $clusterName = "time-microservice"
