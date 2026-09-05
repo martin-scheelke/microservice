@@ -15,6 +15,7 @@ Observability
 Performance
 Simplicity
 Do not make unnecessary architectural changes.
+Use SOLID and ACID principles
 
 Before modifying existing code, inspect the relevant implementation, tests, configuration, database schema and callers.
 
@@ -29,7 +30,7 @@ Spring Boot 4.x
 Spring Framework 7.x
 Maven
 PostgreSQL
-Liquibase
+Flyway
 Spring Data JPA where appropriate
 Spring Security
 OAuth2
@@ -279,7 +280,7 @@ repositories
 transactions
 constraints
 indexes
-Liquibase migrations
+Flyway migrations
 serialization
 Spring configuration
 Spring Security integration
