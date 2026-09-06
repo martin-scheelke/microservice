@@ -86,3 +86,26 @@ cluster down with:
 ```
 ./scripts/kind-down.ps1
 ```
+
+With `gitlab-runner`, one job at a time (no GitLab server needed). There's no
+"run the whole pipeline" command: pipeline orchestration (stages, the `needs:`
+DAG, passing artifacts between jobs) is done by the GitLab server, not the
+runner — `gitlab-runner exec` just runs one job's script in isolation,
+standing in for the server for that single job. Run jobs in the stage order
+below, with `--docker-privileged` on jobs that use the `docker:24-dind`
+service (integration tests, Pact provider verification, both
+`docker-build-*` jobs). `exec` is also deprecated in newer `gitlab-runner`
+releases and may print a warning, or be unavailable, depending on your
+installed version:
+
+```
+gitlab-runner exec docker build-microservice
+gitlab-runner exec docker build-client
+gitlab-runner exec docker unit-test-microservice
+gitlab-runner exec docker unit-test-client
+gitlab-runner exec docker integration-test-microservice --docker-privileged
+gitlab-runner exec docker pact-consumer
+gitlab-runner exec docker pact-provider-verify --docker-privileged
+gitlab-runner exec docker docker-build-microservice --docker-privileged
+gitlab-runner exec docker docker-build-client --docker-privileged
+```

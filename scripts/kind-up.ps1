@@ -1,8 +1,8 @@
 #Requires -Version 5.1
-<#
-Builds both application images, creates (or reuses) the local kind cluster,
-loads the images into it, and applies the local Kustomize overlay.
-#>
+
+#Builds both application images, creates (or reuses) the local kind cluster,
+#loads the images into it, and applies the local Kustomize overlay.
+
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 

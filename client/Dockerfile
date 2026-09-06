@@ -6,10 +6,10 @@ WORKDIR /build
 COPY pom.xml .
 COPY microservice/pom.xml microservice/pom.xml
 COPY client/pom.xml client/pom.xml
-RUN mvn -B -q -pl client -am dependency:go-offline || true
+RUN mvn -B -pl client -am dependency:go-offline
 
 COPY client/src client/src
-RUN mvn -B -q -pl client -am package -DskipTests
+RUN mvn -B -pl client -am package -DskipTests
 
 FROM eclipse-temurin:24-jre-alpine
 WORKDIR /app
