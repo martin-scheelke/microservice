@@ -1,4 +1,5 @@
 # Time microservice
+Spring boot, Pact, Test Containers, openAPI, Docker, Kubernetes 
 
 ## Description
 
